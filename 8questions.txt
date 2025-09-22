@@ -1,0 +1,8 @@
+Give RIA’s Standards Definitions [pdf: 12-Franklin--RIA-IEEE_2019-05-19_v2.pdf,page:13-17]
+Give Steps to meet Machinery Directive requirements [pdf: EN_TechnicalguideNo10_REVF.pdf,page:19]
+Give Substantial modifications on  explanation of Article 3 (16) [pdf: oem-sp123_-en-p.pdf, page:9]
+what are the Two new standards in safety and functional safety [pdf: Safety and functional safety, A general guide.pdf,page:9]
+what are the Methods of Safegaurding? [pdf: Safety Committee Handout 1 Machine Guarding.pdf, page: 2]
+Give the Procedure for structural analysis.[pdf:SISTEMA Cookbook (Version1.0),page: 11]
+give information on Specific Machine Hazards and Safeguarding Methods.[pdf:osha3170.pdf ,page: 22]
+give information on some secondary safeguarding methods, work practices, and complementary equipment[pdf:osha3170.pdf,page:49]

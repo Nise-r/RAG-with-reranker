@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Document QnA Chat</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    #loadingMessage {
+      text-align: center;
+      margin: 10px;
+      font-style: italic;
+      color: #555;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-wrapper">
+    <div class="chat-header">📄 Document QnA Chatbot</div>
+
+    <div class="chat-container" id="chat">
+      <!-- Chat messages go here -->
+    </div>
+
+    <!-- ✅ Loading Message -->
+    <div id="loadingMessage">⏳ Generating response...</div>
+
+    <div class="input-row">
+      <button id="uploadBtn" title="Upload Document">📎</button>
+      <input type="file" id="fileInput" hidden />
+      <input
+        type="text"
+        id="questionInput"
+        placeholder="Ask a question..."
+        autocomplete="off"
+        autofocus
+      />
+      <button id="sendBtn" title="Send">📤</button>
+    </div>
+  </div>
+
+  <div class="chunk-panel" id="chunkPanel">
+    <div class="chunk-header" onclick="toggleChunkContent()">📄 Retrieved Chunks</div>
+    <div class="chunk-content collapsed" id="chunkContent">
+      <p>No chunks retrieved yet.</p>
+    </div>
+  </div>
+
+  <script>
+    let context = "";
+
+    const chat = document.getElementById("chat");
+    const fileInput = document.getElementById("fileInput");
+    const uploadBtn = document.getElementById("uploadBtn");
+    const sendBtn = document.getElementById("sendBtn");
+    const questionInput = document.getElementById("questionInput");
+    const loadingMessage = document.getElementById("loadingMessage"); // ✅
+
+    uploadBtn.onclick = () => fileInput.click();
+
+    fileInput.onchange = async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      context = data.text;
+      appendMessage("assistant", `✅ Uploaded`);
+      questionInput.focus();
+    };
+
+    async function sendMessage() {
+      const question = questionInput.value.trim();
+      if (!question) return;
+
+      appendMessage("user", question);
+      questionInput.value = "";
+
+      // ✅ Add temporary "Generating..." assistant message
+      const loadingMsgElement = appendMessage("assistant", "⏳ Generating response...");
+
+      try {
+        const res = await fetch("/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question, context }),
+        });
+
+        const data = await res.json();
+
+        // ✅ Replace loading message with actual answer
+        loadingMsgElement.innerHTML = formatTextToHTML(data.answer);
+        fetchChunks();
+      } catch (err) {
+        loadingMsgElement.innerHTML = "❌ Failed to get response.";
+        console.error("Error:", err);
+      } finally {
+        questionInput.focus();
+      }
+    }
+
+
+    sendBtn.onclick = sendMessage;
+
+    questionInput.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    function formatTextToHTML(text) {
+      return text
+        .replace(/\n/g, "<br>")
+        .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+        .replace(/\*(.+?)\*/g, "<i>$1</i>");
+    }
+
+    function appendMessage(role, text) {
+      const msg = document.createElement("div");
+      msg.className = `message ${role}`;
+      msg.innerHTML = formatTextToHTML(text);
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
+      return msg; // ✅ return the element so we can update it later
+    }
+
+
+    function toggleChunkContent() {
+      const content = document.getElementById("chunkContent");
+      content.classList.toggle("expanded");
+      content.classList.toggle("collapsed");
+    }
+
+    async function fetchChunks() {
+      try {
+        const res = await fetch("/chunks");
+        const data = await res.json();
+        const chunks = data.chunks;
+
+        const contentDiv = document.getElementById("chunkContent");
+        contentDiv.innerHTML = "";
+
+        if (!chunks.length) {
+          contentDiv.innerHTML = "<p>No chunks retrieved yet.</p>";
+        } else {
+          chunks.forEach((chunk) => {
+            const p = document.createElement("p");
+            p.innerText = `🧩 ${JSON.stringify(chunk)}`;
+            p.style.marginBottom = "12px";
+            contentDiv.appendChild(p);
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching chunks:", err);
+        document.getElementById("chunkContent").innerText = "⚠️ Failed to load chunks.";
+      }
+    }
+
+    setInterval(async () => {
+      try {
+        const res = await fetch("/logs");
+        const data = await res.json();
+        data.logs.forEach((log) => {
+          appendMessage("assistant", log);
+        });
+      } catch (e) {
+        console.error("Log polling error:", e);
+      }
+    }, 1000);
+
+    window.onload = () => questionInput.focus();
+  </script>
+</body>
+</html>

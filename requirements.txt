@@ -1,0 +1,15 @@
+rapidocr
+onnxruntime
+pillow
+groq
+PyMuPDF
+langchain
+langchain-core
+pydantic
+typing
+langgraph
+Werkzeug
+rank_bm25
+tabula
+Flask
+fastapi
