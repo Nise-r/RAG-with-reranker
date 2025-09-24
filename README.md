@@ -21,8 +21,8 @@ This project show the comparison between normal RAG system and RAG system with r
 ## 🔄Agent Workflow:
 
 <img width="236" height="450" alt="Unknown" src="https://github.com/user-attachments/assets/929b20dd-9906-4efd-90bb-71e616bf4b20" />
+<img width="600" height="450" alt="Screenshot 2025-09-24 at 10 49 55 AM" src="https://github.com/user-attachments/assets/1996ff6d-f551-46da-8ef4-1b20c94ad420" />
 
-<img width="700" height="450" alt="Screenshot 2025-09-24 at 10 49 55 AM" src="https://github.com/user-attachments/assets/d09e18ec-662a-4178-8319-874a62324f05" />
 
     
 ## 📂Project Structure:
